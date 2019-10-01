@@ -1,0 +1,130 @@
+//Arduino Car v1.0
+enco.h
+
+#ifndef ENCO_H
+#define ENCO_H
+
+
+#include <Arduino.h>
+
+class enco //clase carro_encoder
+{
+  private:
+    int inte1; //
+	int inte2; // 
+	int ena; // 
+    int in1; // 
+	int in2; // 
+	int enb; // 
+	int in3; //
+	int in4; // 	
+ public:
+     enco(int,int,int,int,int,int,int,int);
+     void avanzar(int,int);	 // 
+	 
+};
+
+#endif
+
+enco.cpp
+
+#include "enco.h"
+
+
+enco::enco(int inz, int inx, int inc, int ind,  int inv, int ini, int inu, int iny)
+{
+     inte1=inz;
+	 inte2=inx;
+	 ena=inc;
+     in1=ind;
+	 in2=inv;
+	 enb=ini;
+	 in3=inu;
+	 in4=iny;
+	 
+	 
+     pinMode(inte1, OUTPUT);
+	 pinMode(inte2, OUTPUT);
+	 pinMode(ena, OUTPUT);
+	 pinMode(in1, OUTPUT);
+	 pinMode(in2, OUTPUT);
+	 pinMode(enb, OUTPUT);
+	 pinMode(in3, OUTPUT);
+	 pinMode(in4, OUTPUT);
+	 
+	 
+}
+int contador_A = 0;
+	int contador_B = 0;
+void ISR_contador_A()
+{
+	contador_A++;
+}
+void ISR_contador_B()
+{
+	contador_B++;
+}
+int convertidor(float cm) 
+{
+
+  int resultado;  
+  float circunferencia = (66.10 * 3.14) / 10; 
+  float cm_step = circunferencia / 20;  
+  
+  float f_resultado = cm / cm_step;  
+  resultado = (int) f_resultado; 
+  
+  return resultado;  
+
+}
+
+
+
+void enco::avanzar(int t,int p)
+{
+	 contador_A = 0;
+	 contador_B = 0;
+	attachInterrupt(digitalPinToInterrupt (inte1), ISR_contador_A, RISING);  
+  attachInterrupt(digitalPinToInterrupt (inte2), ISR_contador_B, RISING);
+	digitalWrite(in1,1);
+	digitalWrite(in2,0);
+	digitalWrite(in3,1);
+	digitalWrite(in4,0);
+	
+	while (t > contador_A && t > contador_B)
+	{
+		if(t> contador_A)
+		{
+		 analogWrite(ena,p);
+		 }
+		 else{
+			 analogWrite(ena,0);
+		 }
+	    if(t> contador_B)
+		{
+		 analogWrite(enb,p);
+		 }
+		 else{
+			 analogWrite(enb,0);
+		 }
+	    
+	}
+	
+	analogWrite(ena,0);
+	analogWrite(enb,0);
+	contador_A=0;
+	contador_B=0;
+}
+
+principal
+#include <enco.h>
+
+void setup() {
+  // put your setup code here, to run once:
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
